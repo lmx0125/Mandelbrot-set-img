@@ -21,6 +21,7 @@ If the compilation fails due to a missing dependency, you may need to install th
    sudo apt-get update
    sudo apt-get install libx11-dev
 
+
 This installs the necessary development files for the libx11 library.
 
 Retry the Build:
