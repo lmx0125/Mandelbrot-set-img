@@ -23,7 +23,7 @@ The build.sh script is designed to automate the compilation process.
 This installs the necessary development files for the libx11 library.
 
 Retry the Build:
-After installing the dependencies, rerun the **./build.sh** script.
+After installing the dependencies, rerun the ./build.sh script.
 
 Check for Success:
 If the compilation is successful, you should find executeable file called "set" or "set.exe"(if you change the build.sh)
