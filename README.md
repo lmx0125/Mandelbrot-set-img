@@ -24,7 +24,9 @@ If the compilation fails due to a missing dependency, you may need to install th
 This installs the necessary development files for the libx11 library.
 
 4.**Retry the Build:**
+
 After installing the dependencies, rerun the ./build.sh script.
 
 5.**Check for Success:**
+
 If the compilation is successful, you should find executeable file called "set" or "set.exe"(if you change the build.sh)
