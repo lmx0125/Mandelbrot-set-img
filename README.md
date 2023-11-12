@@ -3,13 +3,13 @@
 To compile your project using `build.sh`, follow these steps:
 
 1. **Clone the Repository:**
-   ```bash
-   git clone https://github.com/lmx0125/Mandelbrot-set-img.git
-   cd Mandelbrot-set-img
+    ```bash
+    git clone https://github.com/lmx0125/Mandelbrot-set-img.git
+    cd Mandelbrot-set-img
 
 2. **Build:**
-   ```bash for linux
-   ./build.sh
+    ```bash for linux
+    ./build.sh
 
 The build.sh script is designed to automate the compilation process.
 
@@ -17,9 +17,9 @@ The build.sh script is designed to automate the compilation process.
 
 If the compilation fails due to a missing dependency, you may need to install the required library. For example, if the error mentions libx11-dev, use the following command:
 
-   ```bash
-   sudo apt-get update
-   sudo apt-get install libx11-dev
+    ```bash
+    sudo apt-get update
+    sudo apt-get install libx11-dev
 
 This installs the necessary development files for the libx11 library.
 
