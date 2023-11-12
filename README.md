@@ -14,6 +14,7 @@ To compile your project using `build.sh`, follow these steps:
 The build.sh script is designed to automate the compilation process.
 
 3.**Install Dependencies (if needed):**
+
 If the compilation fails due to a missing dependency, you may need to install the required library. For example, if the error mentions libx11-dev, use the following command:
 
    ```bash
