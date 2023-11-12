@@ -8,7 +8,7 @@ To compile your project using `build.sh`, follow these steps:
     cd Mandelbrot-set-img
 
 2. **Build:**
-    ```bash for linux
+    ```bash
     ./build.sh
 
 The build.sh script is designed to automate the compilation process.
@@ -17,7 +17,6 @@ The build.sh script is designed to automate the compilation process.
 
 If the compilation fails due to a missing dependency, you may need to install the required library. For example, if the error mentions libx11-dev, use the following command:
 
-    ```bash
     sudo apt-get update
     sudo apt-get install libx11-dev
 
