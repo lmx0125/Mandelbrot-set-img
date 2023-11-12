@@ -20,10 +20,10 @@ The build.sh script is designed to automate the compilation process.
    sudo apt-get update
    sudo apt-get install libx11-dev
 
-   This installs the necessary development files for the libx11 library.
+This installs the necessary development files for the libx11 library.
 
-   Retry the Build:
-   After installing the dependencies, rerun the **./build.sh** script.
+Retry the Build:
+After installing the dependencies, rerun the **./build.sh** script.
 
 Check for Success:
-If the compilation is successful, you should now have the executable or the desired output based on your project.
+If the compilation is successful, you should find executeable file called "set" or "set.exe"(if you change the build.sh)
