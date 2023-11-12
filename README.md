@@ -21,11 +21,10 @@ If the compilation fails due to a missing dependency, you may need to install th
    sudo apt-get update
    sudo apt-get install libx11-dev
 
-
 This installs the necessary development files for the libx11 library.
 
-Retry the Build:
+4.**Retry the Build:**
 After installing the dependencies, rerun the ./build.sh script.
 
-Check for Success:
+5.**Check for Success:**
 If the compilation is successful, you should find executeable file called "set" or "set.exe"(if you change the build.sh)
