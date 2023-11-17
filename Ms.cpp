@@ -1,47 +1,112 @@
-#include <iostream>
-#include <string.h>
-#include <vector>
-#include <complex>
-#include <cmath>
-#include "CImg.h"
+#include "Ms.h"
 
 double prec;
-#define iteration 500
 
 long wigth,height;
 double wight_per_pixel;
+double times;
+long all;
+int cpu_thread_mun;
+std::vector<std::vector<bool>> bool_img;
+long img_line;
+
+long cacued_pixel;
 
 struct C {
 	double r;
 	double i;
 };
 
-class noname
-{
-public:
-	noname() : real(0), virt(0) {}
-	virtual ~noname() { }
+void progress_bar(){
+	std::cout << std::fixed;
 
-	double real;
-	double virt;
+	while(true){
+		if (is_task_finish()){
+		std::cout << "\r[" << BLUE << "INFO" << DEFAULT << "] [POINT > " << all << "/" << all << " | " << "100" << "% ]" << std::endl;
+			return;
+		}
+		std::cout << "\r[" << BLUE << "INFO" << DEFAULT << "] [POINT > " << cacued_pixel << "/" << all << " | " << static_cast<int>(static_cast<double>(cacued_pixel) / all * 100) << "% ]" << std::flush;
+#ifdef __linux__
+		func_sleep(50000);
+#else
+		func_sleep(50);
+#endif
+	}
+}
 
-	noname& operator +=(noname &a) {
-		this->real += a.real;
-		this->virt += a.virt;
-		return *this;
-	}
-	noname& operator *=(noname &a) {
-		double real = this->real;
-		double virt = this->virt;
-		this->real = real * a.real - virt * a.virt;
-		this->virt = real * a.virt + virt * a.real;
-		return *this;
+bool call_next_task(double& wpp,double& i){
+	if (is_task_finish())
+		return false;
+	wpp = wight_per_pixel;
+	times++;
+	i = height - times * wpp;
+	return true;
+}
+
+bool is_task_finish(){
+	if(img_line < 2 / wight_per_pixel)
+		return false;
+	return true;
+}
+
+void cacu_line(){
+
+	double wpp;
+	double i;
+	double r;
+	int linenum;
+
+start_cacu:
+
+	linenum = img_line;
+	img_line++;
+	r = wigth;
+	
+	//std::cout << "[DEBUG] [func > cacu_line() > value -> linenum = " << linenum << " | img_line = " << img_line << " | r = " << r << " ]" << std::endl;
+	
+	if(!call_next_task(wpp,i)){
+		//std::cout << "[" << BLUE << "INFO" << DEFAULT << "] [THREAD > " << pthread_self() << " | " << RED << "EXIT" << DEFAULT << " ]" << std::endl;
+		return;
 	}
 
-	void print() {
-		printf("real:%f, virt:%f\n", this->real, this->virt);
+
+	//std::cout << "[DEBUG] [func > cacu_line() > value -> wpp = " << wpp << " | i = " << i << " ]" << std::endl;
+	
+	//std::cout << "[DEBUG] [func > cacu_line() > call_next_task() > pass]" << std::endl;
+
+	for (int loop_i = 0; loop_i < 3 / wight_per_pixel; ++loop_i) {
+		bool_img[linenum][loop_i] = cacu(r,i);
+		r += wpp;
+		cacued_pixel++;
+		//std::cout << "[DEBUG] [func > cacu_line() > bool_img[linenum].emplace_back(cacu(r,i)); > pass]" << std::endl;
 	}
-};
+
+	//std::cout << "[DEBUG] [func > is_task_finish() > " << is_task_finish() << "]" << std::endl;
+
+	if (!is_task_finish())
+		goto start_cacu;
+
+	//std::cout << "[" << BLUE << "INFO" << DEFAULT << "] [THREAD > " << pthread_self() << " | " << RED << "EXIT" << DEFAULT << " ]" << std::endl;
+	return;
+}
+
+void auto_cacu(){
+	cpu_thread_mun = std::thread::hardware_concurrency();
+	std::cout << "[" << BLUE << "INFO" << DEFAULT << "] [CPU > " << cpu_thread_mun << " ]" << std::endl;
+
+	std::vector<std::thread> workers;
+	for (int i = 0; i < cpu_thread_mun; ++i){
+		workers.emplace_back(std::thread(cacu_line));
+		std::cout << "[" << BLUE << "INFO" << DEFAULT << "] [THREAD > " << i + 1 << " is on | " << GREEN <<"RUNNING" << DEFAULT << " ]" << std::endl;
+	}
+
+	std::thread progress_bar_thread = std::thread(progress_bar);
+	progress_bar_thread.detach();
+
+	for (std::thread &worker : workers) {
+        worker.join();
+    }
+}
 
 bool cacu(double r,double i){
 	std::complex<double> z = 0;
@@ -59,12 +124,12 @@ void get_informations(){
 
 	std::string temp;
 
-	std::cout << "[参数]精度(points per unit) : ";
+	std::cout << "[" << GREEN << "PARA" << DEFAULT << "] Quality (points per unit) : ";
 	std::cin >> temp;
 
 	prec = stoi(temp);
 
-	std::cout << "[INFO] prec = " << prec << std::endl;
+	std::cout << "[" << BLUE << "INFO" << DEFAULT << "] [prec > " << prec << " ]" << std::endl;
 }
 
 int main(){
@@ -72,19 +137,22 @@ int main(){
 
 	wigth = -2;
 	height = 1;
+	img_line = 0;
 	wight_per_pixel = 1.0 / prec;
-	std::cout << "wpp : " << wight_per_pixel << std::endl;
-	std::vector<std::vector<bool>> bool_img;
+	std::cout << "[" << BLUE << "INFO" << DEFAULT << "] [wpp > " << wight_per_pixel << " ]" << std::endl;
 
 	struct C point;
 	point.r = wigth;
 	point.i = height;
 
-	std::cout << std::endl;
+	cacued_pixel = 0;
+	times = 0;
+	all = 6 * prec * prec;
 
-	double times = 0;
-	long all = 6 * prec * prec;
+	bool_img.resize(2 * prec, std::vector<bool>(3 * prec, 0));
 
+	auto_cacu();
+	/*
 	for (int i = 0; i < 2 * prec; ++i) {
 		point.r = -2.0;
 		bool_img.push_back(std::vector<bool>());
@@ -99,24 +167,32 @@ int main(){
 		point.i = point.i - wight_per_pixel;
 	}
 	std::cout << std::endl;
+	*/
 
-	std::cout << cacu(0,0) << std::endl;
+#ifdef __linux__
+		func_sleep(100000);
+#else
+		func_sleep(100);
+#endif
 
-	cimg_library::CImg<unsigned char> img(3 * prec,2 * prec,1,3,0);
-	
-	std::cout << "[INFO] : img create pass" << std::endl;
-	
-	unsigned char color[] = {255, 255, 255};
-	
+	cimg_library::CImg<unsigned char> img(3 * prec,2 * prec,1,1,0);
+	unsigned char color[] = {255};
+
+	std::cout << "[" << BLUE << "INFO" << DEFAULT << "] [IMAGE > Canvas Gen > " << GREEN << "Pass" << DEFAULT << "]" << std::endl;
+
+	img.fill(false);
+
 	for (int i = 0; i < 2 * prec; ++i) {
 		for (int j = 0; j < 3 * prec; ++j) {
 			if(bool_img[i][j] != false)
-				img.draw_point(j, i, color);
+				img.draw_point(j, i,color);
 		}
 	}
 
 	const char* image = "set.bmp";
         img.save(image);
+
+	std::cout << "[" << BLUE << "INFO" << DEFAULT << "] [IMAGE > Save > " << GREEN << "Pass" << DEFAULT << "]" << std::endl;
 
 	return 0;
 }
